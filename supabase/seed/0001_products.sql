@@ -1,0 +1,56 @@
+begin;
+
+insert into public.products (
+  id, slug, name, brand, volume_ml, concentration,
+  pix_price_cents, debit_price_cents, installment_total_cents,
+  stock, category, images
+) values
+('amerati', 'amerati', 'AMEERATI', 'Al Wataniah', 100, 'EDP', 22500, 22727, 25000, 3, null, '["/images/products/AMEERATI.jpeg"]'::jsonb),
+('afaq', 'afaq', 'AFAQ', 'Lattafa', 100, 'EDP', 38736, 39127, 43040, 2, null, '["/images/products/afaq.jpeg"]'::jsonb),
+('alkawn', 'alkawn', 'ALKAWN', 'Mawwal', 100, 'EDP', 36720, 37091, 40800, 2, null, '["/images/products/alkawn.jpeg"]'::jsonb),
+('asad', 'asad', 'ASAD', 'Lattafa', 100, 'EDP', 31500, 31818, 35000, 1, null, '["/images/products/asad.jpeg"]'::jsonb),
+('asad-bourbon', 'asad-bourbon', 'ASAD BOURBON', 'Lattafa', 100, 'EDP', 41398, 41816, 45998, 1, null, '["/images/products/ASAD%20BOURBON.jpeg"]'::jsonb),
+('assad-elixir', 'assad-elixir', 'ASAD ELIXIR', 'Lattafa', 100, 'EDP', 34198, 34544, 37998, 1, null, '["/images/products/ASAD%20ELIXIR.jpeg"]'::jsonb),
+('attar-al-wesal', 'attar-al-wesal', 'ATTAR AL WESAL', 'Al Wataniah', 100, 'EDP', 25200, 25455, 28000, 1, null, '["/images/products/ATTAR%20AL%20WESAL.jpeg"]'::jsonb),
+('basir', 'basir', 'BASIR', 'Mawwal', 100, 'EDP', 36720, 37091, 40800, 1, null, '["/images/products/BASIR.jpeg"]'::jsonb),
+('delilah-blanc', 'delilah-blanc', 'DELILAH BLANC', 'Maison Alhambra', 100, 'EDP', 28800, 29091, 32000, 1, null, '["/images/products/delilah%20blanc.jpeg"]'::jsonb),
+('delilah-rose', 'delilah-rose', 'DELILAH ROSE', 'Maison Alhambra', 100, 'EDP', 34200, 34545, 38000, 1, null, '["/images/products/DELILAH%20ROSE.jpeg"]'::jsonb),
+('durrat-al-aroos', 'durrat-al-aroos', 'DURRAT AL AROOS', 'Al Wataniah', 85, 'EDP', 19888, 20089, 22098, 1, null, '["/images/products/DURRAT%20AL%20AROOS.jpeg"]'::jsonb),
+('dubai-s-chocolate', 'dubai-s-chocolate', 'DUBAI´S CHOCOLATE', 'Mawwal', 100, 'EDP', 28786, 29076, 31984, 1, null, '["/images/products/DUBAI%C2%B4S%20CHOCOLATE.jpeg"]'::jsonb),
+('eclaire', 'eclaire', 'ECLAIRE', 'Lattafa', 100, 'EDP', 26998, 27271, 29998, 1, null, '["/images/products/ECLAIRE.jpeg"]'::jsonb),
+('club-de-nuit-woman', 'club-de-nuit-woman', 'CLUB DE NUIT WOMAN', 'Armaf', 105, 'EDP', 32398, 32725, 35998, 1, null, '["/images/products/CLUB%20DE%20NUIT.jpeg"]'::jsonb),
+('fada-masculino', 'fada-masculino', 'FADA MASCULINO', 'Mawwal', 100, 'EDP', 35856, 36218, 39840, 1, null, '["/images/products/FADA%20MASCULINO.jpeg"]'::jsonb),
+('fakhar-woman-rose', 'fakhar-woman-rose', 'FAKHAR WOMAN ROSE', 'Lattafa', 100, 'EDP', 32398, 32725, 35998, 3, null, '["/images/products/FAKHAR%20WOMAN%20ROSE.jpeg"]'::jsonb),
+('fackar-gold', 'fackar-gold', 'FACKAR GOLD', 'Lattafa', 100, 'EDP', 43020, 43455, 47800, 0, null, '["/images/products/Fakharlattafa.jpeg"]'::jsonb),
+('jardin-de-reve', 'jardin-de-reve', 'JARDIN DE RÊVE', 'Alhambra', 100, 'EDP', 29700, 30000, 33000, 1, null, '["/images/products/JARDIN%20DE%20R%C3%8AVE.jpeg"]'::jsonb),
+('hannah-al-nashahwa', 'hannah-al-nashahwa', 'HANNAH AL NASHWA', 'Style & Scents', 100, 'EDP', 52198, 52725, 57998, 1, null, '["/images/products/HANNAH%20AL%20NASHAHWA.jpeg"]'::jsonb),
+('her-confession', 'her-confession', 'HER CONFESSION', 'Lattafa', 100, 'EDP', 32398, 32725, 35998, 1, null, '["/images/products/HER%20CONFESSION.jpeg"]'::jsonb),
+('la-voie', 'la-voie', 'LA VOIE', 'Maison Alhambra', 100, 'EDP', 29700, 30000, 33000, 1, null, '["/images/products/la%20voie.jpeg"]'::jsonb),
+('lychee-musk', 'lychee-musk', 'LYCHEE MUSK', 'Arabiyat Prestige', 100, 'EDP', 41382, 41800, 45980, 1, null, '["/images/products/lychee%20musk.jpeg"]'::jsonb),
+('malek', 'malek', 'MALEK', 'Mawwal', 100, 'EDP', 29835, 30136, 33150, 1, null, '["/images/products/MALEK.jpeg"]'::jsonb),
+('mussaman', 'mussaman', 'MUSSAMAN', 'Lattafa', 100, 'EDP', 43200, 43636, 48000, 1, null, '["/images/MUSSAMAN.png"]'::jsonb),
+('philos-messenger', 'philos-messenger', 'PHILOS MESSENGER', 'Maison Alhambra', 100, 'EDP', 31500, 31818, 35000, 1, null, '["/images/products/PHILOS%20MESSENGER.jpeg"]'::jsonb),
+('royal-amber', 'royal-amber', 'ROYAL AMBER', 'Mawwal', 100, 'EDP', 34985, 35338, 38872, 1, null, '["/images/products/ROYAL%20AMBER.jpeg"]'::jsonb),
+('sabah-al-ward', 'sabah-al-ward', 'SABAH AL WARD', 'Al Wataniah', 100, 'EDP', 19798, 19998, 21998, 1, null, '["/images/products/SABAH%20AL%20WARD.jpeg"]'::jsonb),
+('sabah-warg-sugar', 'sabah-warg-sugar', 'SABAH WARG SUGAR', 'Al Wataniah', 100, 'EDP', 17998, 18180, 19998, 3, null, '["/images/products/sabahallward.jpeg"]'::jsonb),
+('salvo-elixir', 'salvo-elixir', 'SALVO ELIXIR', 'Maison Alhambra', 60, 'EDP', 29700, 30000, 33000, 2, null, '["/images/products/SALVO%20ELIXIR.jpeg"]'::jsonb),
+('shagaf-al-ward', 'shagaf-al-ward', 'SHAGAF AL WARD', 'Al Wataniah', 100, 'EDP', 23400, 23636, 26000, 1, null, '["/images/products/shagaf.jpeg"]'::jsonb),
+('tharwah-gold', 'tharwah-gold', 'THARWAH GOLD', 'Lattafa', 100, 'EDP', 54000, 54545, 60000, 1, null, '["/images/products/THARWAH%20GOLD.jpeg"]'::jsonb),
+('yara', 'yara', 'YARA', 'Lattafa', 100, 'EDP', 28798, 29089, 31998, 1, null, '["/images/products/yara.jpeg"]'::jsonb),
+('yara-elixir', 'yara-elixir', 'YARA ELIXIR', 'Lattafa', 100, 'EDP', 30598, 30907, 33998, 1, null, '["/images/products/yara%20elixir.jpeg"]'::jsonb),
+('yara-moi', 'yara-moi', 'YARA MOI', 'Lattafa', 100, 'EDP', 23398, 23635, 25998, 1, null, '["/images/products/yara%20moi.jpeg"]'::jsonb),
+('zuhoor', 'zuhoor', 'ZUHOOR', 'Mawwal', 100, 'EDP', 30780, 31091, 34200, 1, null, '["/images/products/ZUHOOR.jpeg"]'::jsonb)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  brand = excluded.brand,
+  volume_ml = excluded.volume_ml,
+  concentration = excluded.concentration,
+  pix_price_cents = excluded.pix_price_cents,
+  debit_price_cents = excluded.debit_price_cents,
+  installment_total_cents = excluded.installment_total_cents,
+  category = excluded.category,
+  images = excluded.images,
+  updated_at = now();
+
+commit;
