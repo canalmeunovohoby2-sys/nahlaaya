@@ -46,6 +46,10 @@ export interface AdminProduct {
   name: string
   brand: string
   volumeMl: number
+  weightGrams: number | null
+  lengthCm: number | null
+  widthCm: number | null
+  heightCm: number | null
   concentration: string
   description: string
   pixPriceCents: number
@@ -129,4 +133,24 @@ export interface ExpiredReservation {
   reservationExpiresAt: string
   totalCents: number
   itemCount: number
+}
+
+export interface MelhorEnvioStatus {
+  connected: boolean
+  accountId: string | null
+  accountName: string | null
+  expiresAt: string | null
+  needsReconnect: boolean
+  connectedAt: string | null
+  scope: string | null
+}
+
+export interface ShippingSettings {
+  originCep: string | null
+  perfumeWeightGrams: number | null
+  boxWeightGrams: number | null
+  boxLengthCm: number | null
+  boxWidthCm: number | null
+  boxHeightCm: number | null
+  maxPerfumesPerBox: number | null
 }

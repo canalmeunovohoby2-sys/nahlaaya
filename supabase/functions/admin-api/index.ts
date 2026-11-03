@@ -5,6 +5,11 @@ import {
   jsonResponse,
 } from '../_shared/http.ts'
 import { getServiceClient, requireAdmin } from '../_shared/supabase.ts'
+import {
+  applyShippingFields,
+  readOptionalPositiveInteger,
+  type ProductShippingInput,
+} from '../_shared/product-shipping.ts'
 
 interface RelatedCustomer {
   full_name: string
@@ -46,6 +51,10 @@ function mapProduct(product: Record<string, unknown>) {
     name: product.name,
     brand: product.brand,
     volumeMl: product.volume_ml,
+    weightGrams: product.weight_grams ?? null,
+    lengthCm: product.length_cm ?? null,
+    widthCm: product.width_cm ?? null,
+    heightCm: product.height_cm ?? null,
     concentration: product.concentration,
     description: product.description ?? '',
     pixPriceCents: product.pix_price_cents,
@@ -67,7 +76,7 @@ interface ProductImageInput {
   contentType: string
 }
 
-interface ProductInput {
+interface ProductInput extends ProductShippingInput {
   name: string
   brand: string
   volumeMl: number
@@ -97,6 +106,10 @@ function readProductInput(body: unknown): ProductInput {
   const description =
     typeof value.description === 'string' ? value.description.trim() : ''
   const volumeMl = Number(value.volumeMl)
+  const weightGrams = readOptionalPositiveInteger(value.weightGrams, 'Peso')
+  const lengthCm = readOptionalPositiveInteger(value.lengthCm, 'Comprimento')
+  const widthCm = readOptionalPositiveInteger(value.widthCm, 'Largura')
+  const heightCm = readOptionalPositiveInteger(value.heightCm, 'Altura')
   const priceCents = Number(value.priceCents)
   const stock = Number(value.stock)
   const active = typeof value.active === 'boolean' ? value.active : true
@@ -146,6 +159,10 @@ function readProductInput(body: unknown): ProductInput {
     description,
     category,
     volumeMl,
+    weightGrams,
+    lengthCm,
+    widthCm,
+    heightCm,
     priceCents,
     stock,
     active,
@@ -251,7 +268,7 @@ async function removeProductImage(
 }
 
 function productWritePayload(input: ProductInput, imageUrl: string | null) {
-  return {
+  const payload: Record<string, unknown> = {
     name: input.name,
     brand: input.brand,
     volume_ml: input.volumeMl,
@@ -265,6 +282,8 @@ function productWritePayload(input: ProductInput, imageUrl: string | null) {
     active: input.active,
     images: imageUrl ? [imageUrl] : [],
   }
+
+  return applyShippingFields(payload, input)
 }
 
 function mapOrderDetail(order: Record<string, unknown>) {
@@ -370,6 +389,154 @@ Deno.serve(async (request) => {
       if (error) throw new HttpError(500, error.message)
 
       return jsonResponse({ released: Number(data ?? 0) }, 200, headers)
+    }
+
+    if (request.method === 'GET' && action === 'melhor-envio-status') {
+      const { data, error } = await client
+        .from('integration_connections')
+        .select('account_id,account_name,token_expires_at,needs_reconnect,connected_at,scope')
+        .eq('provider', 'melhor_envio')
+        .maybeSingle()
+
+      if (error) throw new HttpError(500, error.message)
+
+      return jsonResponse(
+        {
+          connected: Boolean(data),
+          accountId: data?.account_id ?? null,
+          accountName: data?.account_name ?? null,
+          expiresAt: data?.token_expires_at ?? null,
+          needsReconnect: data?.needs_reconnect ?? false,
+          connectedAt: data?.connected_at ?? null,
+          scope: data?.scope ?? null,
+        },
+        200,
+        headers,
+      )
+    }
+
+    if (request.method === 'PATCH' && action === 'melhor-envio-disconnect') {
+      const { error } = await client
+        .from('integration_connections')
+        .delete()
+        .eq('provider', 'melhor_envio')
+
+      if (error) throw new HttpError(500, error.message)
+
+      return jsonResponse({ disconnected: true }, 200, headers)
+    }
+
+    if (request.method === 'GET' && action === 'shipping-settings') {
+      const { data, error } = await client
+        .from('shipping_settings')
+        .select(
+          'origin_cep,perfume_weight_grams,box_weight_grams,box_length_cm,box_width_cm,box_height_cm,max_perfumes_per_box',
+        )
+        .eq('id', true)
+        .maybeSingle()
+
+      if (error) throw new HttpError(500, error.message)
+
+      return jsonResponse(
+        {
+          originCep: data?.origin_cep ?? null,
+          perfumeWeightGrams: data?.perfume_weight_grams ?? null,
+          boxWeightGrams: data?.box_weight_grams ?? null,
+          boxLengthCm: data?.box_length_cm ?? null,
+          boxWidthCm: data?.box_width_cm ?? null,
+          boxHeightCm: data?.box_height_cm ?? null,
+          maxPerfumesPerBox: data?.max_perfumes_per_box ?? null,
+        },
+        200,
+        headers,
+      )
+    }
+
+    if (request.method === 'PATCH' && action === 'shipping-settings') {
+      const body = await request.json()
+
+      if (typeof body !== 'object' || body === null || Array.isArray(body)) {
+        throw new HttpError(400, 'Configuração de envio inválida.')
+      }
+
+      const input = body as Record<string, unknown>
+      const { data: existing, error: readError } = await client
+        .from('shipping_settings')
+        .select('*')
+        .eq('id', true)
+        .maybeSingle()
+
+      if (readError) throw new HttpError(500, readError.message)
+
+      const updates: Record<string, unknown> = {
+        id: true,
+        updated_at: new Date().toISOString(),
+      }
+
+      function has(key: string): boolean {
+        return Object.prototype.hasOwnProperty.call(input, key)
+      }
+
+      if (has('originCep')) {
+        if (input.originCep !== null && typeof input.originCep !== 'string') {
+          throw new HttpError(400, 'CEP de origem inválido.')
+        }
+
+        const rawCep =
+          typeof input.originCep === 'string'
+            ? input.originCep.replace(/\D/g, '')
+            : ''
+
+        if (rawCep && !/^[0-9]{8}$/.test(rawCep)) {
+          throw new HttpError(400, 'Informe um CEP de origem com 8 dígitos.')
+        }
+
+        updates.origin_cep = rawCep || null
+      } else {
+        updates.origin_cep = existing?.origin_cep ?? null
+      }
+
+      const fields: [string, string, string][] = [
+        ['perfumeWeightGrams', 'perfume_weight_grams', 'Peso do perfume'],
+        ['boxWeightGrams', 'box_weight_grams', 'Peso da caixa'],
+        ['boxLengthCm', 'box_length_cm', 'Comprimento da caixa'],
+        ['boxWidthCm', 'box_width_cm', 'Largura da caixa'],
+        ['boxHeightCm', 'box_height_cm', 'Altura da caixa'],
+        ['maxPerfumesPerBox', 'max_perfumes_per_box', 'Máximo por caixa'],
+      ]
+
+      for (const [inputKey, column, label] of fields) {
+        if (has(inputKey)) {
+          const parsed = readOptionalPositiveInteger(input[inputKey], label)
+          if (parsed !== undefined) updates[column] = parsed
+        } else {
+          updates[column] = existing?.[column] ?? null
+        }
+      }
+
+      const { data, error } = await client
+        .from('shipping_settings')
+        .upsert(updates, { onConflict: 'id' })
+        .select(
+          'origin_cep,perfume_weight_grams,box_weight_grams,box_length_cm,box_width_cm,box_height_cm,max_perfumes_per_box',
+        )
+        .single()
+
+      if (error) throw new HttpError(500, error.message)
+
+      return jsonResponse(
+        {
+          originCep: data?.origin_cep ?? null,
+          perfumeWeightGrams: data?.perfume_weight_grams ?? null,
+          boxWeightGrams: data?.box_weight_grams ?? null,
+          boxLengthCm: data?.box_length_cm ?? null,
+          boxWidthCm: data?.box_width_cm ?? null,
+          boxHeightCm: data?.box_height_cm ?? null,
+          maxPerfumesPerBox: data?.max_perfumes_per_box ?? null,
+        },
+        200,
+        headers,
+      )
     }
 
     if (request.method === 'POST' && action === 'products') {

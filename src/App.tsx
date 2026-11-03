@@ -6,6 +6,7 @@ import { StoreLayout } from './components/layout/StoreLayout'
 import { CartProvider } from './context/CartProvider'
 import { CatalogProvider } from './context/CatalogProvider'
 import { AdminCustomersPage } from './pages/AdminCustomersPage'
+import { AdminIntegrationsPage } from './pages/AdminIntegrationsPage'
 import { AdminDashboardPage } from './pages/AdminDashboardPage'
 import { AdminLoginPage } from './pages/AdminLoginPage'
 import { AdminOrdersPage } from './pages/AdminOrdersPage'
@@ -45,6 +46,7 @@ function App() {
               <Route path="produtos" element={<AdminProductsPage />} />
               <Route path="pedidos" element={<AdminOrdersPage />} />
               <Route path="clientes" element={<AdminCustomersPage />} />
+              <Route path="integracoes" element={<AdminIntegrationsPage />} />
             </Route>
 
             <Route element={<StoreLayout />}>

@@ -18,7 +18,10 @@
     "migration:export": "node scripts/migration/export-sqlite.mjs",
     "migration:validate": "node scripts/migration/validate-export.mjs",
     "test:visits": "tsx --test tests/visits.test.ts",
-    "test:checkout": "tsx --test tests/checkout-storage.test.ts"
+    "test:checkout": "tsx --test tests/checkout-storage.test.ts",
+    "test:melhor-envio": "tsx --test tests/melhor-envio-oauth.test.ts",
+    "test:shipping": "tsx --test tests/shipping-product-preservation.test.ts",
+    "test:shipping-package": "tsx --test tests/shipping-package.test.ts"
   },
   "dependencies": {
     "@fontsource/dm-sans": "^5.3.0",

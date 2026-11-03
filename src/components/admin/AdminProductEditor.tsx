@@ -38,6 +38,18 @@ export function AdminProductEditor({
   const [concentration, setConcentration] = useState(
     product?.concentration ?? 'EDP',
   )
+  const [weightGrams, setWeightGrams] = useState(
+    product?.weightGrams ? String(product.weightGrams) : '',
+  )
+  const [lengthCm, setLengthCm] = useState(
+    product?.lengthCm ? String(product.lengthCm) : '',
+  )
+  const [widthCm, setWidthCm] = useState(
+    product?.widthCm ? String(product.widthCm) : '',
+  )
+  const [heightCm, setHeightCm] = useState(
+    product?.heightCm ? String(product.heightCm) : '',
+  )
   const [category, setCategory] = useState<
     'masculino' | 'feminino' | ''
   >(
@@ -111,6 +123,39 @@ export function AdminProductEditor({
       return
     }
 
+    function optionalPositiveInteger(value: string, label: string) {
+      if (!value.trim()) {
+        return null
+      }
+
+      const parsed = Number(value)
+
+      if (!Number.isSafeInteger(parsed) || parsed <= 0) {
+        throw new Error(label + ' inválido.')
+      }
+
+      return parsed
+    }
+
+    let weightValue: number | null
+    let lengthValue: number | null
+    let widthValue: number | null
+    let heightValue: number | null
+
+    try {
+      weightValue = optionalPositiveInteger(weightGrams, 'Peso')
+      lengthValue = optionalPositiveInteger(lengthCm, 'Comprimento')
+      widthValue = optionalPositiveInteger(widthCm, 'Largura')
+      heightValue = optionalPositiveInteger(heightCm, 'Altura')
+    } catch (validationError) {
+      setError(
+        validationError instanceof Error
+          ? validationError.message
+          : 'Dados de envio inválidos.',
+      )
+      return
+    }
+
     if (!product && !image) {
       setError('Selecione uma imagem para o novo produto.')
       return
@@ -123,6 +168,10 @@ export function AdminProductEditor({
       name: name.trim(),
       brand: brand.trim(),
       volumeMl: volumeValue,
+      weightGrams: weightValue,
+      lengthCm: lengthValue,
+      widthCm: widthValue,
+      heightCm: heightValue,
       concentration: concentration.trim(),
       description: description.trim(),
       category,
@@ -255,6 +304,63 @@ export function AdminProductEditor({
               value={stock}
               onChange={(event) => setStock(event.target.value)}
               required
+            />
+          </div>
+
+          <div className="admin-field">
+            <label htmlFor="product-weight">
+              Peso do volume individual pronto para envio (g)
+            </label>
+            <input
+              id="product-weight"
+              type="number"
+              min="1"
+              step="1"
+              value={weightGrams}
+              onChange={(event) => setWeightGrams(event.target.value)}
+              placeholder="Ex.: 500"
+            />
+            <p className="admin-product-form__hint">
+              Inclua neste peso a embalagem individual do perfume.
+            </p>
+          </div>
+
+          <div className="admin-field">
+            <label htmlFor="product-length">Comprimento (cm)</label>
+            <input
+              id="product-length"
+              type="number"
+              min="1"
+              step="1"
+              value={lengthCm}
+              onChange={(event) => setLengthCm(event.target.value)}
+              placeholder="Ex.: 20"
+            />
+          </div>
+
+          <div className="admin-field">
+            <label htmlFor="product-width">Largura (cm)</label>
+            <input
+              id="product-width"
+              type="number"
+              min="1"
+              step="1"
+              value={widthCm}
+              onChange={(event) => setWidthCm(event.target.value)}
+              placeholder="Ex.: 15"
+            />
+          </div>
+
+          <div className="admin-field">
+            <label htmlFor="product-height">Altura (cm)</label>
+            <input
+              id="product-height"
+              type="number"
+              min="1"
+              step="1"
+              value={heightCm}
+              onChange={(event) => setHeightCm(event.target.value)}
+              placeholder="Ex.: 10"
             />
           </div>
 

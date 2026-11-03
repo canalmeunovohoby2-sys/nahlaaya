@@ -1,62 +1,35 @@
-export type PromoArt = 'bottle' | 'flower' | 'leaf'
-
 export interface PromoSlide {
   id: string
-  eyebrow: string
-  title: string
-  description: string
   ctaLabel: string
   ctaTo: string
-  tone: 'green' | 'champagne' | 'cream'
-  art: PromoArt
-  image?: string
+  image: string
+  mobileImage?: string
   imageAlt?: string
 }
 
 export const promoSlides: PromoSlide[] = [
   {
     id: 'banner-asad',
-    eyebrow: 'Lattafa',
-    title: 'ASAD',
-    description: 'ASAD e ASAD Elixir.',
-    ctaLabel: 'Conhecer ASAD',
-    ctaTo: '/produto/asad',
-    tone: 'green',
-    art: 'bottle',
-    image: '/images/bannerhero1.png',
-    imageAlt: 'Embalagens ASAD e ASAD Elixir da Lattafa',
-  },
-  {
-    id: 'colecao',
-    eyebrow: 'Coleção Nahla Aya',
-    title: 'Perfume para cada momento.',
-    description:
-      'Uma seleção pensada para acompanhar a sua rotina, os seus encontros e as ocasiões que merecem ser lembradas.',
-    ctaLabel: 'Ver todos os perfumes',
+    ctaLabel: 'Ver perfumes',
     ctaTo: '/perfumes',
-    tone: 'green',
-    art: 'bottle',
+    image: '/images/bannerhero1.png',
+    mobileImage: '/images/bannerheromovbile1.png',
+    imageAlt: 'Perfumes árabes Fada, Ameerati e Sabah Al Ward',
   },
   {
-    id: 'femininos',
-    eyebrow: 'Femininos',
-    title: 'A sua assinatura, do seu jeito.',
-    description:
-      'Opções para diferentes estilos e ocasiões, com a elegância de sempre.',
-    ctaLabel: 'Ver femininos',
-    ctaTo: '/femininos',
-    tone: 'champagne',
-    art: 'flower',
+    id: 'banner-luxo',
+    ctaLabel: 'Ver perfumes',
+    ctaTo: '/perfumes',
+    image: '/images/bannerhero2.png',
+    mobileImage: '/images/bannerheromobile2.png',
+    imageAlt: 'O luxo do perfume que combina com seu estilo',
   },
   {
-    id: 'masculinos',
-    eyebrow: 'Masculinos',
-    title: 'Presença em cada detalhe.',
-    description:
-      'Perfumes para acompanhar a sua rotina com personalidade e sofisticação.',
-    ctaLabel: 'Ver masculinos',
-    ctaTo: '/masculinos',
-    tone: 'cream',
-    art: 'leaf',
+    id: 'banner-destaque',
+    ctaLabel: 'Ver perfumes',
+    ctaTo: '/perfumes',
+    image: '/images/bannerhero3.png',
+    mobileImage: '/images/bannerheromobile3.png',
+    imageAlt: 'Perfumes em destaque na Nahla Aya',
   },
 ]

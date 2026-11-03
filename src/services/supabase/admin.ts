@@ -1,4 +1,4 @@
-import { supabase } from './client'
+import { invokeEdgeFunction, supabase } from './client'
 import { AdminApiError, notifyAdminUnauthorized } from '../../admin/errors'
 import type {
   AdminCustomer,
@@ -7,6 +7,8 @@ import type {
   AdminOrderListItem,
   AdminProduct,
   ExpiredReservation,
+  MelhorEnvioStatus,
+  ShippingSettings,
   VisitStats,
 } from '../../types/admin'
 
@@ -142,6 +144,10 @@ export interface ProductEditorInput {
   name: string
   brand: string
   volumeMl: number
+  weightGrams: number | null
+  lengthCm: number | null
+  widthCm: number | null
+  heightCm: number | null
   concentration: string
   description: string
   category: 'masculino' | 'feminino'
@@ -177,4 +183,45 @@ export async function deleteSupabaseProduct(id: string): Promise<void> {
     `products&id=${encodeURIComponent(id)}`,
     { method: 'DELETE' },
   )
+}
+
+export async function startMelhorEnvioOAuth(): Promise<string> {
+  const data = await invokeEdgeFunction<{ authorizationUrl: string }>(
+    'melhor-envio-oauth-start',
+    {},
+  )
+  return data.authorizationUrl
+}
+
+export async function getMelhorEnvioStatus(): Promise<MelhorEnvioStatus> {
+  return adminRequest<MelhorEnvioStatus>('melhor-envio-status')
+}
+
+export async function disconnectMelhorEnvio(): Promise<void> {
+  await adminRequest<{ disconnected: boolean }>('melhor-envio-disconnect', {
+    method: 'PATCH',
+  })
+}
+
+export async function getShippingSettings(): Promise<ShippingSettings> {
+  return adminRequest<ShippingSettings>('shipping-settings')
+}
+
+export interface ShippingSettingsInput {
+  originCep?: string | null
+  perfumeWeightGrams?: number | null
+  boxWeightGrams?: number | null
+  boxLengthCm?: number | null
+  boxWidthCm?: number | null
+  boxHeightCm?: number | null
+  maxPerfumesPerBox?: number | null
+}
+
+export async function updateShippingSettings(
+  input: ShippingSettingsInput,
+): Promise<ShippingSettings> {
+  return adminRequest<ShippingSettings>('shipping-settings', {
+    method: 'PATCH',
+    body: input,
+  })
 }
