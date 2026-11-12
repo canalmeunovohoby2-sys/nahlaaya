@@ -1,0 +1,113 @@
+name: Supabase keep alive
+
+on:
+  schedule:
+    # 08:00, 14:00 e 20:00 em Brasília (UTC-3, sem horário de verão)
+    - cron: '0 11,17,23 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: supabase-keepalive
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  keepalive:
+    name: Consultar produtos no Supabase
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Validar secrets
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          missing=0
+          if [ -z "${SUPABASE_URL:-}" ]; then
+            echo "Secret ausente: SUPABASE_URL"
+            missing=1
+          fi
+          if [ -z "${SUPABASE_ANON_KEY:-}" ]; then
+            echo "Secret ausente: SUPABASE_ANON_KEY"
+            missing=1
+          fi
+
+          if [ "$missing" -ne 0 ]; then
+            echo "### Supabase keep alive" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Falha: cadastre os secrets na configuração do repositório." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+      - name: Consultar tabela pública products
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        shell: bash
+        run: |
+          set -u
+
+          url="${SUPABASE_URL%/}/rest/v1/products?select=id&limit=1"
+          body="${RUNNER_TEMP}/supabase-keepalive-response.json"
+          success=0
+          last_status="000"
+          last_duration="0"
+
+          {
+            echo "## Supabase keep alive"
+            echo ""
+            echo "- Horário UTC: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+            echo "- Horário de Brasília: $(TZ=America/Sao_Paulo date '+%Y-%m-%d %H:%M:%S')"
+            echo "- Tabela consultada: public.products"
+            echo "- Campo consultado: id"
+            echo ""
+            echo "| Tentativa | HTTP | Duração | Resultado |"
+            echo "|---:|---:|---:|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          for attempt in 1 2 3; do
+            started=$(date +%s%3N)
+            http_code=$(curl \
+              --silent \
+              --show-error \
+              --connect-timeout 10 \
+              --max-time 20 \
+              --output "$body" \
+              --write-out '%{http_code}' \
+              --request GET \
+              --header "apikey: ${SUPABASE_ANON_KEY}" \
+              --header "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+              --header "Accept: application/json" \
+              "$url") || http_code="000"
+            finished=$(date +%s%3N)
+            duration_ms=$((finished - started))
+            last_status="$http_code"
+            last_duration="$duration_ms"
+
+            if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+              success=1
+              echo "| ${attempt} | ${http_code} | ${duration_ms} ms | Sucesso |" >> "$GITHUB_STEP_SUMMARY"
+              break
+            fi
+
+            echo "| ${attempt} | ${http_code} | ${duration_ms} ms | Falhou |" >> "$GITHUB_STEP_SUMMARY"
+
+            if [ "$attempt" -lt 3 ]; then
+              sleep $((attempt * 10))
+            fi
+          done
+
+          rm -f "$body"
+
+          if [ "$success" -eq 1 ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "Consulta concluída com sucesso." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Falha após 3 tentativas. Último HTTP: ${last_status}; duração: ${last_duration} ms." >> "$GITHUB_STEP_SUMMARY"
+          exit 1
