@@ -728,3 +728,37 @@
     grid-template-columns: 1fr;
   }
 }
+
+.checkout-shipping__lookup {
+  display: grid;
+  grid-template-columns: minmax(0, 240px) auto;
+  align-items: start;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.checkout-shipping__cep {
+  width: 100%;
+  max-width: 240px;
+}
+
+.checkout-shipping__calculate {
+  min-height: 48px;
+  margin-top: 26px;
+  padding-inline: 24px;
+}
+
+@media (max-width: 520px) {
+  .checkout-shipping__lookup {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-shipping__cep {
+    max-width: none;
+  }
+
+  .checkout-shipping__calculate {
+    width: 100%;
+    margin-top: 0;
+  }
+}

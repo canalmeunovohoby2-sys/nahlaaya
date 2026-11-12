@@ -63,6 +63,7 @@ export function CheckoutPage() {
   const [selectedShippingId, setSelectedShippingId] = useState<string | null>(null)
   const [shippingLoading, setShippingLoading] = useState(false)
   const [shippingError, setShippingError] = useState<string | null>(null)
+  const [shippingQuoteTrigger, setShippingQuoteTrigger] = useState(0)
   const shippingItemsKey = lines
     .map((line) => `${line.productId}:${line.quantity}`)
     .sort()
@@ -139,7 +140,7 @@ export function CheckoutPage() {
       if (clearTimer) window.clearTimeout(clearTimer)
       if (requestTimer) window.clearTimeout(requestTimer)
     }
-  }, [form.cep, shippingItemsKey, lines])
+  }, [form.cep, shippingItemsKey, lines, shippingQuoteTrigger])
 
   if (lines.length === 0 || hasUnavailableItems) {
     return <Navigate to="/carrinho" replace />
@@ -204,6 +205,19 @@ export function CheckoutPage() {
     setShippingError(null)
     setSubmission(null)
     setSubmitError(null)
+  }
+
+  function handleCalculateShipping() {
+    const cep = onlyDigits(form.cep)
+
+    if (cep.length !== 8) {
+      setShippingError('Informe um CEP de destino com 8 dígitos.')
+      document.getElementById('checkout-shipping-cep')?.focus()
+      return
+    }
+
+    setShippingError(null)
+    setShippingQuoteTrigger((current) => current + 1)
   }
 
   const selectedShipping =
@@ -454,10 +468,14 @@ export function CheckoutPage() {
                 </section>
 
                 <CheckoutShipping
+                  cep={form.cep}
+                  cepError={errors.cep ?? null}
                   options={shippingOptions}
                   selectedId={selectedShippingId}
                   loading={shippingLoading}
                   error={shippingError}
+                  onCepChange={(value) => handleFieldChange('cep', value)}
+                  onCalculate={handleCalculateShipping}
                   onSelect={handleShippingChange}
                 />
 

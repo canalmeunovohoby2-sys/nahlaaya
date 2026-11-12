@@ -2,18 +2,26 @@ import { formatCurrency } from '../../lib/format'
 import type { ShippingQuoteOption } from '../../types/checkout'
 
 interface CheckoutShippingProps {
+  cep: string
+  cepError: string | null
   options: ShippingQuoteOption[]
   selectedId: string | null
   loading: boolean
   error: string | null
+  onCepChange: (value: string) => void
+  onCalculate: () => void
   onSelect: (id: string) => void
 }
 
 export function CheckoutShipping({
+  cep,
+  cepError,
   options,
   selectedId,
   loading,
   error,
+  onCepChange,
+  onCalculate,
   onSelect,
 }: CheckoutShippingProps) {
   return (
@@ -27,11 +35,47 @@ export function CheckoutShipping({
         <span className="checkout-panel__index">03</span>
         <div>
           <h2 id="shipping-title">Frete</h2>
-          <p>
-            Informe o CEP no endereço acima para consultar as opções de frete
-            disponíveis.
-          </p>
+          <p>Consulte as opções de entrega para o CEP de destino.</p>
         </div>
+      </div>
+
+      <div className="checkout-shipping__lookup">
+        <div
+          className={`checkout-field checkout-shipping__cep${
+            cepError ? ' checkout-field--error' : ''
+          }`}
+        >
+          <label htmlFor="checkout-shipping-cep">
+            CEP de destino<span aria-hidden="true"> *</span>
+          </label>
+          <input
+            id="checkout-shipping-cep"
+            inputMode="numeric"
+            autoComplete="postal-code"
+            maxLength={9}
+            value={cep}
+            onChange={(event) => onCepChange(event.target.value)}
+            placeholder="00000-000"
+            aria-invalid={Boolean(cepError)}
+            aria-describedby={
+              cepError ? 'checkout-shipping-cep-error' : undefined
+            }
+          />
+          {cepError ? (
+            <p className="checkout-field__error" id="checkout-shipping-cep-error">
+              {cepError}
+            </p>
+          ) : null}
+        </div>
+
+        <button
+          type="button"
+          className="btn btn--gold checkout-shipping__calculate"
+          onClick={onCalculate}
+          disabled={loading}
+        >
+          {loading ? 'Calculando...' : 'Calcular'}
+        </button>
       </div>
 
       {loading ? (
