@@ -10,6 +10,37 @@ import {
   readOptionalPositiveInteger,
   type ProductShippingInput,
 } from '../_shared/product-shipping.ts'
+import { encryptSecret } from '../_shared/secret-crypto.ts'
+import {
+  loadMercadoPagoConfig,
+  readMercadoPagoSettingsRow,
+  summarizeMercadoPagoSettings,
+} from '../_shared/mercadopago-credentials.ts'
+
+type AdminServiceClient = ReturnType<typeof getServiceClient>
+
+function mercadoPagoWebhookUrl(): string | null {
+  const base = Deno.env.get('MERCADO_PAGO_WEBHOOK_URL')?.trim()
+    || Deno.env.get('SUPABASE_URL')?.trim()
+
+  if (!base) {
+    return null
+  }
+
+  return base.replace(/\/+$/, '').endsWith('/functions/v1/mercadopago-webhook')
+    ? base.replace(/\/+$/, '')
+    : base.replace(/\/+$/, '') + '/functions/v1/mercadopago-webhook'
+}
+
+async function mercadoPagoSettingsResponse(client: AdminServiceClient) {
+  const row = await readMercadoPagoSettingsRow(client)
+  const summary = summarizeMercadoPagoSettings(row)
+
+  return {
+    ...summary,
+    webhookUrl: mercadoPagoWebhookUrl(),
+  }
+}
 
 interface RelatedCustomer {
   full_name: string
@@ -535,6 +566,159 @@ Deno.serve(async (request) => {
           maxPerfumesPerBox: data?.max_perfumes_per_box ?? null,
         },
         200,
+        headers,
+      )
+    }
+
+    if (request.method === 'GET' && action === 'mercadopago-settings') {
+      return jsonResponse(await mercadoPagoSettingsResponse(client), 200, headers)
+    }
+
+    if (request.method === 'PATCH' && action === 'mercadopago-settings') {
+      const body = await request.json().catch(() => null)
+
+      if (typeof body !== 'object' || body === null || Array.isArray(body)) {
+        throw new HttpError(400, 'Configuração do Mercado Pago inválida.')
+      }
+
+      const input = body as Record<string, unknown>
+      const { data: existing, error: readError } = await client
+        .from('mercadopago_settings')
+        .select('*')
+        .eq('id', true)
+        .maybeSingle()
+
+      if (readError) throw new HttpError(500, readError.message)
+
+      const current = (existing ?? {}) as Record<string, unknown>
+      const updates: Record<string, unknown> = {
+        id: true,
+        updated_at: new Date().toISOString(),
+        validation_status: 'pending',
+        validation_message: null,
+        validated_at: null,
+      }
+      let changed = false
+
+      for (const key of ['publicKey', 'accessToken', 'webhookSecret']) {
+        if (Object.prototype.hasOwnProperty.call(input, key) && input[key] !== undefined) {
+          if (typeof input[key] !== 'string') {
+            throw new HttpError(400, 'Credencial inválida.')
+          }
+
+          if ((input[key] as string).length > 8_192) {
+            throw new HttpError(400, 'Credencial muito longa.')
+          }
+        }
+      }
+
+      if (typeof input.publicKey === 'string' && input.publicKey.trim()) {
+        updates.public_key = input.publicKey.trim()
+        changed = true
+      } else {
+        updates.public_key = current.public_key ?? null
+      }
+
+      if (typeof input.accessToken === 'string' && input.accessToken.trim()) {
+        const encrypted = await encryptSecret(input.accessToken.trim())
+        updates.access_token_ciphertext = encrypted.ciphertext
+        updates.access_token_iv = encrypted.iv
+        updates.access_token_tag = encrypted.tag
+        changed = true
+      } else {
+        updates.access_token_ciphertext = current.access_token_ciphertext ?? null
+        updates.access_token_iv = current.access_token_iv ?? null
+        updates.access_token_tag = current.access_token_tag ?? null
+      }
+
+      if (typeof input.webhookSecret === 'string' && input.webhookSecret.trim()) {
+        const encrypted = await encryptSecret(input.webhookSecret.trim())
+        updates.webhook_secret_ciphertext = encrypted.ciphertext
+        updates.webhook_secret_iv = encrypted.iv
+        updates.webhook_secret_tag = encrypted.tag
+        changed = true
+      } else {
+        updates.webhook_secret_ciphertext = current.webhook_secret_ciphertext ?? null
+        updates.webhook_secret_iv = current.webhook_secret_iv ?? null
+        updates.webhook_secret_tag = current.webhook_secret_tag ?? null
+      }
+
+      if (!changed) {
+        throw new HttpError(400, 'Informe ao menos uma credencial para salvar.')
+      }
+
+      const { error } = await client
+        .from('mercadopago_settings')
+        .upsert(updates, { onConflict: 'id' })
+
+      if (error) throw new HttpError(500, error.message)
+
+      return jsonResponse(await mercadoPagoSettingsResponse(client), 200, headers)
+    }
+
+    if (request.method === 'POST' && action === 'mercadopago-validate') {
+      const row = await readMercadoPagoSettingsRow(client)
+      const summary = summarizeMercadoPagoSettings(row)
+
+      if (
+        !summary.publicKeyConfigured ||
+        !summary.accessTokenConfigured ||
+        !summary.webhookSecretConfigured
+      ) {
+        return jsonResponse(
+          {
+            ...summary,
+            webhookUrl: mercadoPagoWebhookUrl(),
+            message: 'Preencha todas as credenciais antes de validar.',
+          },
+          400,
+          headers,
+        )
+      }
+
+      const config = await loadMercadoPagoConfig(client)
+
+      if (!config) {
+        throw new HttpError(409, 'Credenciais do Mercado Pago incompletas.')
+      }
+
+      const controller = new AbortController()
+      const timer = setTimeout(() => controller.abort(), 10_000)
+      let valid = false
+
+      try {
+        const response = await fetch('https://api.mercadopago.com/users/me', {
+          headers: { Authorization: `Bearer ${config.accessToken}` },
+          signal: controller.signal,
+        })
+        valid = response.ok
+      } catch {
+        valid = false
+      } finally {
+        clearTimeout(timer)
+      }
+
+      const { error } = await client
+        .from('mercadopago_settings')
+        .update({
+          validation_status: valid ? 'valid' : 'error',
+          validation_message: valid
+            ? 'Access Token validado. O Webhook Secret e a entrega das notificações não foram testados.'
+            : 'Não foi possível validar as credenciais no Mercado Pago.',
+          validated_at: valid ? new Date().toISOString() : null,
+        })
+        .eq('id', true)
+
+      if (error) throw new HttpError(500, error.message)
+
+      return jsonResponse(
+        {
+          ...(await mercadoPagoSettingsResponse(client)),
+          message: valid
+            ? 'Access Token validado. O Webhook Secret e a entrega das notificações não foram testados.'
+            : 'As credenciais não foram aceitas pelo Mercado Pago.',
+        },
+        valid ? 200 : 502,
         headers,
       )
     }

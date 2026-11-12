@@ -96,7 +96,10 @@ export function CheckoutSummary({
                 <p className="checkout-item__qty">
                   {line.quantity} {line.quantity === 1 ? 'unidade' : 'unidades'}
                   {' · '}
-                  {formatCurrency(unit)} cada
+                  <span className="checkout-item__monetary">
+                    {formatCurrency(unit)}
+                  </span>{' '}
+                  cada
                 </p>
               </div>
               <p className="checkout-item__total">{formatCurrency(lineTotal)}</p>
@@ -152,7 +155,7 @@ export function CheckoutSummary({
             : 'Finalizar pedido'}
       </button>
       <p className="checkout-summary__checkout-note">
-        Pagamento e frete serão confirmados na próxima etapa.
+        A confirmação definitiva do pagamento é feita pelo webhook do Mercado Pago.
       </p>
 
       {submission ? (
@@ -160,7 +163,7 @@ export function CheckoutSummary({
           <strong>Pedido registrado</strong>
           <span>Número {submission.order.orderNumber}</span>
           <p>{submission.message}</p>
-          <p>O pagamento está pendente. Nenhuma cobrança foi realizada.</p>
+          <p>Continue na etapa de pagamento abaixo.</p>
         </div>
       ) : null}
 

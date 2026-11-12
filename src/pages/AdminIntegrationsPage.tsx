@@ -7,6 +7,7 @@ import {
 } from '../services/supabase/admin'
 import { AdminApiError } from '../admin/errors'
 import { usePageTitle } from '../hooks/usePageTitle'
+import { MercadoPagoIntegrationCard } from '../components/admin/MercadoPagoIntegrationCard'
 import { ShippingSettingsCard } from '../components/admin/ShippingSettingsCard'
 import type { MelhorEnvioStatus } from '../types/admin'
 
@@ -167,6 +168,8 @@ export function AdminIntegrationsPage() {
           Não foi possível consultar o estado das integrações.
         </div>
       ) : null}
+
+      <MercadoPagoIntegrationCard />
 
       {loadState === 'ready' && status ? (
         <section className="admin-card admin-integration-card">

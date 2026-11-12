@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Navigate } from 'react-router-dom'
 import { CheckoutField } from '../components/checkout/CheckoutField'
+import { CheckoutPaymentStep } from '../components/checkout/CheckoutPaymentStep'
 import { CheckoutShipping } from '../components/checkout/CheckoutShipping'
 import { CheckoutSummary } from '../components/checkout/CheckoutSummary'
 import { PageHeader } from '../components/ui/PageHeader'
@@ -154,6 +155,10 @@ export function CheckoutPage() {
   }
 
   function handleFieldChange(field: CheckoutFormField, value: string) {
+    if (submission) {
+      return
+    }
+
     let nextValue = value
 
     if (field === 'cpf') {
@@ -505,6 +510,7 @@ export function CheckoutPage() {
                       <input
                         type="radio"
                         name="payment"
+                        disabled={Boolean(submission)}
                         value="pix"
                         checked={paymentMethod === 'pix'}
                         onChange={() => handlePaymentChange('pix')}
@@ -525,6 +531,7 @@ export function CheckoutPage() {
                       <input
                         type="radio"
                         name="payment"
+                        disabled={Boolean(submission)}
                         value="debit"
                         checked={paymentMethod === 'debit'}
                         onChange={() => handlePaymentChange('debit')}
@@ -547,13 +554,17 @@ export function CheckoutPage() {
                       <input
                         type="radio"
                         name="payment"
+                        disabled={Boolean(submission)}
                         value="credit"
                         checked={paymentMethod === 'credit'}
                         onChange={() => handlePaymentChange('credit')}
                       />
                       <strong>{formatCurrency(installmentTotal)}</strong>
                       <span className="checkout-payment-card__note">
-                        ou {formatInstallment(installmentTotal)}
+                        ou{' '}
+                        <span className="checkout-payment-card__monetary">
+                          {formatInstallment(installmentTotal)}
+                        </span>
                       </span>
                     </label>
                   </div>
@@ -574,6 +585,16 @@ export function CheckoutPage() {
               />
             </div>
           </form>
+
+          {submission ? (
+            <CheckoutPaymentStep
+              order={submission}
+              paymentMethod={paymentMethod}
+              payerName={form.fullName}
+              payerEmail={form.email}
+              payerCpf={form.cpf}
+            />
+          ) : null}
         </div>
       </section>
     </>

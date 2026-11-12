@@ -45,6 +45,18 @@ export interface CheckoutSubmissionResult {
   status: 'pending-payment'
   message: string
   order: CheckoutOrderSummary
+  orderAccessToken?: string
+}
+
+export interface MercadoPagoPayment {
+  provider: 'mercadopago'
+  paymentId: string
+  status: string
+  statusDetail: string | null
+  orderNumber: string
+  qrCode: string | null
+  qrCodeBase64: string | null
+  ticketUrl: string | null
 }
 
 export interface ShippingQuoteRequest {

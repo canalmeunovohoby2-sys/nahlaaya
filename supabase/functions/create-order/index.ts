@@ -5,6 +5,7 @@ import {
   jsonResponse,
 } from '../_shared/http.ts'
 import { calculateServerShippingQuote } from '../_shared/melhor-envio-quote.ts'
+import { signOrderAccessToken } from '../_shared/order-access.ts'
 import {
   buildOrderShippingPayload,
   selectQuoteOption,
@@ -74,6 +75,10 @@ Deno.serve(async (request) => {
         message:
           'Pedido recebido. Os itens ficam reservados durante o prazo de pagamento. O pagamento está pendente e nenhuma cobrança foi realizada.',
         order: data,
+        orderAccessToken: await signOrderAccessToken(
+          Number(data?.id),
+          typeof data?.orderNumber === 'string' ? data.orderNumber : '',
+        ),
       },
       201,
       corsHeaders(request),

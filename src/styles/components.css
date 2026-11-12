@@ -142,7 +142,7 @@
 
 .price__value {
   color: var(--green-900);
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  font-family: var(--font-number);
   font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.035em;
@@ -193,7 +193,7 @@
 
 .price__installment-copy strong {
   color: var(--green-900);
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  font-family: var(--font-number);
   font-weight: 700;
   background: none;
   text-shadow: none;

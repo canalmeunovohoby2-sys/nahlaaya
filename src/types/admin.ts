@@ -145,6 +145,30 @@ export interface MelhorEnvioStatus {
   scope: string | null
 }
 
+export type MercadoPagoCredentialStatus =
+  | 'awaiting_credentials'
+  | 'incomplete'
+  | 'configured'
+  | 'validated'
+  | 'error'
+
+export interface MercadoPagoSettings {
+  status: MercadoPagoCredentialStatus
+  publicKeyConfigured: boolean
+  accessTokenConfigured: boolean
+  webhookSecretConfigured: boolean
+  encryptionKeyConfigured: boolean
+  validationMessage: string | null
+  validatedAt: string | null
+  webhookUrl: string | null
+}
+
+export interface MercadoPagoSettingsInput {
+  publicKey?: string
+  accessToken?: string
+  webhookSecret?: string
+}
+
 export interface ShippingSettings {
   originCep: string | null
   perfumeWeightGrams: number | null

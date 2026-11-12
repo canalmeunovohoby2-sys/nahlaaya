@@ -8,6 +8,8 @@ import type {
   AdminProduct,
   ExpiredReservation,
   MelhorEnvioStatus,
+  MercadoPagoSettings,
+  MercadoPagoSettingsInput,
   ShippingSettings,
   VisitStats,
 } from '../../types/admin'
@@ -200,6 +202,25 @@ export async function getMelhorEnvioStatus(): Promise<MelhorEnvioStatus> {
 export async function disconnectMelhorEnvio(): Promise<void> {
   await adminRequest<{ disconnected: boolean }>('melhor-envio-disconnect', {
     method: 'PATCH',
+  })
+}
+
+export async function getMercadoPagoSettings(): Promise<MercadoPagoSettings> {
+  return adminRequest<MercadoPagoSettings>('mercadopago-settings')
+}
+
+export async function updateMercadoPagoSettings(
+  input: MercadoPagoSettingsInput,
+): Promise<MercadoPagoSettings> {
+  return adminRequest<MercadoPagoSettings>('mercadopago-settings', {
+    method: 'PATCH',
+    body: input,
+  })
+}
+
+export async function validateMercadoPagoSettings(): Promise<MercadoPagoSettings> {
+  return adminRequest<MercadoPagoSettings>('mercadopago-validate', {
+    method: 'POST',
   })
 }
 
