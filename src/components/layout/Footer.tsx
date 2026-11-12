@@ -91,7 +91,7 @@ export function Footer() {
             <Link to="/admin/login" className="footer__admin-link">
               Área administrativa
             </Link>
-            <p className="footer__signature">Perfumaria de assinatura</p>
+            <p className="footer__signature">Perfumaria selecionada</p>
           </div>
         </div>
       </div>

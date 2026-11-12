@@ -3,7 +3,7 @@ import type { FormEvent } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { navigation } from '../../data/categories'
 import { useCart } from '../../hooks/useCart'
-import { BagIcon, MenuIcon, SearchIcon, UserIcon } from '../icons/Icons'
+import { BagIcon, MenuIcon, SearchIcon } from '../icons/Icons'
 import { Logo } from '../ui/Logo'
 import { MobileMenu } from './MobileMenu'
 
@@ -96,16 +96,6 @@ export function Header() {
           />
 
           <div className="header-actions">
-            <button
-              type="button"
-              className="icon-button icon-button--account"
-              disabled
-              aria-label="Minha conta — em breve"
-              title="Área do cliente em breve"
-            >
-              <UserIcon width={21} height={21} />
-            </button>
-
             <NavLink
               to="/carrinho"
               className={({ isActive }) =>

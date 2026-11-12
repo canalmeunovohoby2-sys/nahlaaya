@@ -4,7 +4,7 @@ import { NavLink } from 'react-router-dom'
 import { navigation } from '../../data/categories'
 import { siteConfig } from '../../config/site'
 import { useCart } from '../../hooks/useCart'
-import { ArrowUpRightIcon, BagIcon, CloseIcon, UserIcon } from '../icons/Icons'
+import { ArrowUpRightIcon, BagIcon, CloseIcon } from '../icons/Icons'
 import { Logo } from '../ui/Logo'
 
 interface MobileMenuProps {
@@ -120,10 +120,6 @@ export function MobileMenu({ open, onClose, returnFocusRef }: MobileMenuProps) {
               Sacola
               {totalItems > 0 ? <span>{totalItems}</span> : null}
             </NavLink>
-            <span className="mobile-menu__shortcut mobile-menu__shortcut--muted">
-              <UserIcon width={19} height={19} />
-              Conta em breve
-            </span>
           </div>
           <p className="mobile-menu__signature">
             {siteConfig.wordmark} · {siteConfig.tagline}
