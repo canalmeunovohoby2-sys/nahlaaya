@@ -14,7 +14,7 @@ export const promoSlides: PromoSlide[] = [
     ctaTo: '/perfumes',
     image: '/images/bannerhero1.png',
     mobileImage: '/images/bannerheromovbile1.png',
-    imageAlt: 'Mais que um aroma: a sua assinatura pessoal',
+    imageAlt: 'Mais que um aroma: a sua identidade olfativa',
   },
   {
     id: 'banner-arabes',

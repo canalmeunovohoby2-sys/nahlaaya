@@ -5,7 +5,7 @@ export function FemininosPage() {
     <CatalogPage
       eyebrow="Coleção"
       title="Femininos"
-      description="Perfumes femininos selecionados para acompanhar a sua assinatura em diferentes momentos."
+      description="Perfumes femininos selecionados para acompanhar o seu estilo em diferentes momentos."
       crumbs={[
         { label: 'Início', to: '/' },
         { label: 'Perfumes', to: '/perfumes' },
