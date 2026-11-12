@@ -274,7 +274,7 @@ export function CheckoutPage() {
   }
 
   return (
-    <>
+    <div className="checkout-page-scope">
       <PageHeader
         eyebrow="Finalização"
         title="Checkout"
@@ -597,6 +597,6 @@ export function CheckoutPage() {
           ) : null}
         </div>
       </section>
-    </>
+    </div>
   )
 }

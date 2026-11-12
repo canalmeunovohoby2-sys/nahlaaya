@@ -47,6 +47,7 @@
   --radius-pill: 999px;
 
   --font-number: 'Inter', 'Segoe UI', Arial, sans-serif;
+  --font-ui: 'Inter', 'Segoe UI', Arial, sans-serif;
   --font-display: 'Belgiano Serif', Georgia, 'Times New Roman', serif;
   --font-sans: 'Belgiano Serif', Georgia, 'Times New Roman', serif;
 
@@ -54,4 +55,23 @@
   --page-gutter: clamp(18px, 4vw, 32px);
   --section-space: clamp(56px, 8vw, 96px);
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Áreas operacionais: fonte convencional, enquanto a vitrine mantém a fonte editorial. */
+.admin-shell,
+.admin-login,
+.checkout-page-scope {
+  --font-display: var(--font-ui);
+  --font-sans: var(--font-ui);
+  font-family: var(--font-ui);
+}
+
+.admin-shell input,
+.admin-shell select,
+.admin-shell textarea,
+.admin-login input,
+.checkout-page-scope input,
+.checkout-page-scope select,
+.checkout-page-scope textarea {
+  font-family: var(--font-ui);
 }
