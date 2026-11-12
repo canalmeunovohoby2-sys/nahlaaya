@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Belgiano Serif';
+  src: url('/belgiano-serif.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   color-scheme: light;
 
@@ -38,8 +46,8 @@
   --radius-xl: 36px;
   --radius-pill: 999px;
 
-  --font-display: 'Bodoni Moda', 'Times New Roman', Georgia, serif;
-  --font-sans: 'Lora', Georgia, 'Times New Roman', serif;
+  --font-display: 'Belgiano Serif', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Belgiano Serif', Georgia, 'Times New Roman', serif;
 
   --container: 1200px;
   --page-gutter: clamp(18px, 4vw, 32px);
