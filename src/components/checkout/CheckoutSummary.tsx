@@ -56,7 +56,7 @@ export function CheckoutSummary({
       : paymentMethod === 'credit'
         ? installmentTotal
         : subtotalPix
-  const shippingPrice = selectedShipping?.priceCents ?? 0
+  const shippingPrice = (selectedShipping?.priceCents ?? 0) / 100
   const total = subtotal + shippingPrice
 
   const items = lines
@@ -113,7 +113,7 @@ export function CheckoutSummary({
         <div className="checkout-summary__row">
           <span>Frete</span>
           {selectedShipping ? (
-            <strong>{formatCurrency(selectedShipping.priceCents)}</strong>
+            <strong>{formatCurrency(selectedShipping.priceCents / 100)}</strong>
           ) : (
             <span className="checkout-summary__pending">A calcular</span>
           )}

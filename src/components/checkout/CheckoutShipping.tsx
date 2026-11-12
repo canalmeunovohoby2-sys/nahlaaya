@@ -135,7 +135,7 @@ export function CheckoutShipping({
                   {option.estimatedDays}{' '}
                   {option.estimatedDays === 1 ? 'dia útil' : 'dias úteis'}
                 </span>
-                <strong>{formatCurrency(option.priceCents)}</strong>
+                <strong>{formatCurrency(option.priceCents / 100)}</strong>
               </label>
             )
           })}
