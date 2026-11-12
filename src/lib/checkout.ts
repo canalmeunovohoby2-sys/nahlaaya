@@ -117,6 +117,7 @@ export function buildCheckoutPayload(
   values: CheckoutFormValues,
   paymentMethod: PaymentMethod,
   lines: CartLine[],
+  shippingServiceId?: string,
 ): CheckoutPayload {
   const buyer: BuyerInfo = {
     fullName: values.fullName.trim(),
@@ -145,5 +146,6 @@ export function buildCheckoutPayload(
     address,
     paymentMethod,
     items,
+    ...(shippingServiceId ? { shippingServiceId } : {}),
   }
 }

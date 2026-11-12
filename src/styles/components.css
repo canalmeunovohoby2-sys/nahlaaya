@@ -142,7 +142,7 @@
 
 .price__value {
   color: var(--green-900);
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.035em;

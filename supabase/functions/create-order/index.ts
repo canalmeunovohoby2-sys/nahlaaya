@@ -4,6 +4,11 @@ import {
   HttpError,
   jsonResponse,
 } from '../_shared/http.ts'
+import { calculateServerShippingQuote } from '../_shared/melhor-envio-quote.ts'
+import {
+  buildOrderShippingPayload,
+  selectQuoteOption,
+} from '../_shared/shipping-quote.ts'
 import { getServiceClient } from '../_shared/supabase.ts'
 import { normalizeCheckoutPayload } from '../_shared/validation.ts'
 
@@ -25,6 +30,20 @@ Deno.serve(async (request) => {
     const payload = normalizeCheckoutPayload(raw)
     const client = getServiceClient()
 
+    if (!payload.shippingServiceId) {
+      throw new HttpError(422, 'Selecione uma modalidade de envio válida.')
+    }
+
+    const quote = await calculateServerShippingQuote(
+      client,
+      payload.items,
+      payload.address.cep,
+    )
+    const selectedShipping = selectQuoteOption(
+      quote.options,
+      payload.shippingServiceId,
+    )
+
     const { error: releaseError } = await client.rpc(
       'release_expired_order_reservations',
     )
@@ -37,7 +56,10 @@ Deno.serve(async (request) => {
     }
 
     const { data, error } = await client.rpc('create_order', {
-      p_payload: payload,
+      p_payload: {
+        ...payload,
+        shipping: buildOrderShippingPayload(quote, selectedShipping),
+      },
     })
 
     if (error) {

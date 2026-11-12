@@ -33,6 +33,65 @@ const completeIndividual = {
   heightCm: 6,
 }
 
+const estimatedGlobalConfig: GlobalPackaging = {
+  perfumeWeightGrams: 700,
+  boxWeightGrams: 200,
+  boxLengthCm: 35,
+  boxWidthCm: 25,
+  boxHeightCm: 15,
+  maxPerfumesPerBox: 3,
+}
+
+test('padrão estimado: um perfume gera uma caixa de 900 g', () => {
+  const result = calculateShippingPackages(
+    [{ id: 'a', quantity: 1 }],
+    estimatedGlobalConfig,
+  )
+
+  assert.equal(result.packages.length, 1)
+  assert.equal(result.packages[0].weightGrams, 900)
+})
+
+test('padrão estimado: dois perfumes geram uma caixa de 1,6 kg', () => {
+  const result = calculateShippingPackages(
+    [{ id: 'a', quantity: 2 }],
+    estimatedGlobalConfig,
+  )
+
+  assert.equal(result.packages.length, 1)
+  assert.equal(result.packages[0].weightGrams, 1600)
+})
+
+test('padrão estimado: três perfumes geram uma caixa de 2,3 kg', () => {
+  const result = calculateShippingPackages(
+    [{ id: 'a', quantity: 3 }],
+    estimatedGlobalConfig,
+  )
+
+  assert.equal(result.packages.length, 1)
+  assert.equal(result.packages[0].weightGrams, 2300)
+})
+
+test('padrão estimado: quatro perfumes geram duas caixas e um peso de caixa por volume', () => {
+  const result = calculateShippingPackages(
+    [{ id: 'a', quantity: 4 }],
+    estimatedGlobalConfig,
+  )
+
+  assert.equal(result.packages.length, 2)
+  assert.deepEqual(
+    result.packages.map((box) => box.weightGrams),
+    [2300, 900],
+  )
+  assert.deepEqual(
+    result.packages.map((box) => box.items),
+    [
+      [{ productId: 'a', quantity: 3 }],
+      [{ productId: 'a', quantity: 1 }],
+    ],
+  )
+})
+
 test('um perfume usa uma caixa padrão e soma o peso externo', () => {
   const result = calculateShippingPackages(
     [{ id: 'asad', quantity: 1 }],

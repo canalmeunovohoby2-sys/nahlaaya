@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Navigate } from 'react-router-dom'
 import { CheckoutField } from '../components/checkout/CheckoutField'
+import { CheckoutShipping } from '../components/checkout/CheckoutShipping'
 import { CheckoutSummary } from '../components/checkout/CheckoutSummary'
 import { PageHeader } from '../components/ui/PageHeader'
 import { useCart } from '../hooks/useCart'
@@ -13,6 +14,7 @@ import {
   formatCep,
   formatCpf,
   formatPhone,
+  onlyDigits,
   validateCheckoutForm,
 } from '../lib/checkout'
 import {
@@ -27,10 +29,12 @@ import type {
   CheckoutFormValues,
 } from '../lib/checkout'
 import { submitCheckout } from '../services/checkout'
+import { requestShippingQuote } from '../services/shipping'
 import { formatCurrency, formatInstallment } from '../lib/format'
 import type {
   CheckoutSubmissionResult,
   PaymentMethod,
+  ShippingQuoteOption,
 } from '../types/checkout'
 
 export function CheckoutPage() {
@@ -55,13 +59,97 @@ export function CheckoutPage() {
   const [submission, setSubmission] =
     useState<CheckoutSubmissionResult | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [shippingOptions, setShippingOptions] = useState<ShippingQuoteOption[]>([])
+  const [selectedShippingId, setSelectedShippingId] = useState<string | null>(null)
+  const [shippingLoading, setShippingLoading] = useState(false)
+  const [shippingError, setShippingError] = useState<string | null>(null)
+  const shippingItemsKey = lines
+    .map((line) => `${line.productId}:${line.quantity}`)
+    .sort()
+    .join('|')
 
   useEffect(() => {
     writeSavedCheckout(form)
   }, [form])
 
+  useEffect(() => {
+    const cep = onlyDigits(form.cep)
+    let active = true
+    let clearTimer: number | undefined
+    let requestTimer: number | undefined
+
+    if (cep.length === 8) {
+      clearTimer = window.setTimeout(() => {
+        if (!active) {
+          return
+        }
+
+        setShippingOptions([])
+        setSelectedShippingId(null)
+        setShippingLoading(true)
+        setShippingError(null)
+      }, 0)
+
+      requestTimer = window.setTimeout(() => {
+        void requestShippingQuote({
+          cep,
+          items: lines.map((line) => ({
+            productId: line.productId,
+            quantity: line.quantity,
+          })),
+        })
+          .then((result) => {
+            if (!active) {
+              return
+            }
+
+            if (result.status !== 'quote') {
+              setShippingError(result.message)
+              return
+            }
+
+            setShippingOptions(result.options)
+            setSelectedShippingId((current) =>
+              result.options.some((option) => option.id === current)
+                ? current
+                : (result.options[0]?.id ?? null),
+            )
+          })
+          .catch((error: unknown) => {
+            if (!active) {
+              return
+            }
+
+            setShippingError(
+              error instanceof Error
+                ? error.message
+                : 'Não foi possível calcular o frete.',
+            )
+          })
+          .finally(() => {
+            if (active) {
+              setShippingLoading(false)
+            }
+          })
+      }, 450)
+    }
+
+    return () => {
+      active = false
+      if (clearTimer) window.clearTimeout(clearTimer)
+      if (requestTimer) window.clearTimeout(requestTimer)
+    }
+  }, [form.cep, shippingItemsKey, lines])
+
   if (lines.length === 0 || hasUnavailableItems) {
     return <Navigate to="/carrinho" replace />
+  }
+
+  function resetShippingQuote() {
+    setShippingOptions([])
+    setSelectedShippingId(null)
+    setShippingLoading(false)
+    setShippingError(null)
   }
 
   function handleFieldChange(field: CheckoutFormField, value: string) {
@@ -71,6 +159,7 @@ export function CheckoutPage() {
       nextValue = formatCpf(value)
     } else if (field === 'cep') {
       nextValue = formatCep(value)
+      resetShippingQuote()
     } else if (field === 'phone') {
       nextValue = formatPhone(value)
     } else if (field === 'state') {
@@ -101,6 +190,7 @@ export function CheckoutPage() {
     setErrors({})
     setSubmission(null)
     setSubmitError(null)
+    resetShippingQuote()
   }
 
   function handlePaymentChange(method: PaymentMethod) {
@@ -108,6 +198,16 @@ export function CheckoutPage() {
     setSubmission(null)
     setSubmitError(null)
   }
+
+  function handleShippingChange(id: string) {
+    setSelectedShippingId(id)
+    setShippingError(null)
+    setSubmission(null)
+    setSubmitError(null)
+  }
+
+  const selectedShipping =
+    shippingOptions.find((option) => option.id === selectedShippingId) ?? null
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -121,11 +221,26 @@ export function CheckoutPage() {
       return
     }
 
+    if (!selectedShipping) {
+      setShippingError(
+        shippingLoading
+          ? 'Aguarde o cálculo do frete.'
+          : 'Calcule o frete e selecione uma modalidade de envio antes de finalizar.',
+      )
+      document.getElementById('checkout-shipping')?.focus()
+      return
+    }
+
     setIsSubmitting(true)
     setSubmitError(null)
 
     try {
-      const payload = buildCheckoutPayload(form, paymentMethod, lines)
+      const payload = buildCheckoutPayload(
+        form,
+        paymentMethod,
+        lines,
+        selectedShipping.id,
+      )
       const result = await submitCheckout(payload)
       setSubmission(result)
     } catch (error) {
@@ -333,14 +448,22 @@ export function CheckoutPage() {
                   </div>
 
                   <p className="checkout-panel__note">
-                    A consulta automática de CEP e o cálculo de frete serão
-                    integrados ao Melhor Envio em uma próxima etapa.
+                    O CEP informado será usado para calcular as opções de
+                    frete disponíveis.
                   </p>
                 </section>
 
+                <CheckoutShipping
+                  options={shippingOptions}
+                  selectedId={selectedShippingId}
+                  loading={shippingLoading}
+                  error={shippingError}
+                  onSelect={handleShippingChange}
+                />
+
                 <section className="checkout-panel" aria-labelledby="payment-title">
                   <div className="checkout-panel__heading">
-                    <span className="checkout-panel__index">03</span>
+                    <span className="checkout-panel__index">04</span>
                     <div>
                       <h2 id="payment-title">Forma de pagamento</h2>
                       <p>Escolha como deseja pagar pelos produtos.</p>
@@ -429,6 +552,7 @@ export function CheckoutPage() {
                 isSubmitting={isSubmitting}
                 submission={submission}
                 submitError={submitError}
+                selectedShipping={selectedShipping}
               />
             </div>
           </form>

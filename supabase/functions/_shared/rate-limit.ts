@@ -24,7 +24,7 @@ async function hashKey(value: string): Promise<string> {
     .join('')
 }
 
-export async function enforceVisitRateLimit(
+export async function enforceRateLimit(
   request: Request,
   limit = 30,
   windowMs = 10 * 60 * 1000,
@@ -51,4 +51,12 @@ export async function enforceVisitRateLimit(
   }
 
   current.count += 1
+}
+
+export function enforceVisitRateLimit(
+  request: Request,
+  limit = 30,
+  windowMs = 10 * 60 * 1000,
+): Promise<void> {
+  return enforceRateLimit(request, limit, windowMs)
 }

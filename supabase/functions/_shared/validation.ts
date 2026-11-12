@@ -23,6 +23,7 @@ export interface NormalizedCheckoutPayload {
   }
   paymentMethod: PaymentMethod
   items: NormalizedCheckoutItem[]
+  shippingServiceId: string | null
 }
 
 const states = new Set([
@@ -124,6 +125,14 @@ export function normalizeCheckoutPayload(raw: unknown): NormalizedCheckoutPayloa
   const city = text(addressData.city, 'a cidade')
   const state = text(addressData.state, 'o estado').toUpperCase()
   const paymentMethod = payload.paymentMethod
+  const shippingServiceId =
+    typeof payload.shippingServiceId === 'string'
+      ? payload.shippingServiceId.trim()
+      : ''
+
+  if (shippingServiceId.length > 100) {
+    throw new Error('Opção de frete inválida.')
+  }
 
   if (fullName.length < 3) throw new Error('Nome incompleto.')
   if (!validCpf(cpf)) throw new Error('CPF inválido.')
@@ -189,5 +198,6 @@ export function normalizeCheckoutPayload(raw: unknown): NormalizedCheckoutPayloa
       productId,
       quantity,
     })),
+    shippingServiceId: shippingServiceId || null,
   }
 }

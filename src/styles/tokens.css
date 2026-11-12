@@ -38,8 +38,8 @@
   --radius-xl: 36px;
   --radius-pill: 999px;
 
-  --font-display: 'Outfit', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  --font-sans: 'DM Sans', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Bodoni Moda', 'Times New Roman', Georgia, serif;
+  --font-sans: 'Lora', Georgia, 'Times New Roman', serif;
 
   --container: 1200px;
   --page-gutter: clamp(18px, 4vw, 32px);

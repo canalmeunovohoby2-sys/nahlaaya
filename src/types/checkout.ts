@@ -27,6 +27,7 @@ export interface CheckoutPayload {
   address: ShippingAddress
   paymentMethod: PaymentMethod
   items: CheckoutItem[]
+  shippingServiceId?: string
 }
 
 export type IntegrationStatus = 'integration-pending'
@@ -54,8 +55,11 @@ export interface ShippingQuoteRequest {
 export interface ShippingQuoteOption {
   id: string
   label: string
-  price: number
+  company: string
+  priceCents: number
   estimatedDays: number
+  deliveryMin: number | null
+  deliveryMax: number | null
 }
 
 export type ShippingQuoteResult =

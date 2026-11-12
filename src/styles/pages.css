@@ -179,7 +179,7 @@
   display: block;
   margin-top: 6px;
   color: var(--green-900);
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   font-size: clamp(38px, 4vw, 46px);
   font-variant-numeric: tabular-nums;
   font-weight: 700;
@@ -214,7 +214,7 @@
 
 .product-pricing__option-value {
   color: var(--green-900);
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   font-size: 22px;
   font-variant-numeric: tabular-nums;
   font-weight: 700;
@@ -435,6 +435,7 @@
 .cart-item__unit {
   flex-shrink: 0;
   color: var(--green-900);
+  font-family: var(--font-display);
   font-size: 15px;
   font-weight: 600;
   text-align: right;
@@ -488,7 +489,7 @@
 
 .cart-item__total {
   color: var(--green-900);
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   font-size: 20px;
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -584,7 +585,7 @@
   display: block;
   margin-top: 5px;
   color: var(--green-900);
-  font-family: var(--font-sans);
+  font-family: var(--font-display);
   font-size: 36px;
   font-variant-numeric: tabular-nums;
   font-weight: 700;
@@ -611,6 +612,7 @@
 
 .summary-row strong {
   color: var(--green-900);
+  font-family: var(--font-display);
   font-weight: 700;
 }
 

@@ -2,7 +2,11 @@ import { Link } from 'react-router-dom'
 import { formatCurrency, formatInstallment } from '../../lib/format'
 import { getProductById } from '../../lib/catalog'
 import { useCart } from '../../hooks/useCart'
-import type { PaymentMethod, CheckoutSubmissionResult } from '../../types/checkout'
+import type {
+  PaymentMethod,
+  CheckoutSubmissionResult,
+  ShippingQuoteOption,
+} from '../../types/checkout'
 import type { Product } from '../../types/product'
 
 interface CheckoutSummaryProps {
@@ -10,6 +14,7 @@ interface CheckoutSummaryProps {
   isSubmitting: boolean
   submission: CheckoutSubmissionResult | null
   submitError: string | null
+  selectedShipping: ShippingQuoteOption | null
 }
 
 const paymentLabels: Record<PaymentMethod, string> = {
@@ -35,6 +40,7 @@ export function CheckoutSummary({
   isSubmitting,
   submission,
   submitError,
+  selectedShipping,
 }: CheckoutSummaryProps) {
   const {
     lines,
@@ -50,6 +56,8 @@ export function CheckoutSummary({
       : paymentMethod === 'credit'
         ? installmentTotal
         : subtotalPix
+  const shippingPrice = selectedShipping?.priceCents ?? 0
+  const total = subtotal + shippingPrice
 
   const items = lines
     .map((line) => ({ line, product: getProductById(line.productId) }))
@@ -104,15 +112,26 @@ export function CheckoutSummary({
         </div>
         <div className="checkout-summary__row">
           <span>Frete</span>
-          <span className="checkout-summary__pending">A calcular</span>
+          {selectedShipping ? (
+            <strong>{formatCurrency(selectedShipping.priceCents)}</strong>
+          ) : (
+            <span className="checkout-summary__pending">A calcular</span>
+          )}
         </div>
+        {selectedShipping ? (
+          <p className="checkout-summary__shipping-label">
+            {selectedShipping.label} · {selectedShipping.estimatedDays}{' '}
+            {selectedShipping.estimatedDays === 1 ? 'dia útil' : 'dias úteis'}
+          </p>
+        ) : null}
         <div className="checkout-summary__row checkout-summary__row--total">
           <span>Total do pedido</span>
-          <strong>{formatCurrency(subtotal)}</strong>
+          <strong>{formatCurrency(total)}</strong>
         </div>
         <p className="checkout-summary__note">
-          Frete não incluído. O cálculo será habilitado com a integração do Melhor
-          Envio.
+          {selectedShipping
+            ? 'Frete selecionado e incluído no total.'
+            : 'Selecione uma opção de frete para incluir no total.'}
         </p>
         {paymentMethod === 'credit' ? (
           <p className="checkout-summary__installment">
@@ -124,7 +143,7 @@ export function CheckoutSummary({
       <button
         type="submit"
         className="btn btn--primary btn--block checkout-summary__submit"
-        disabled={isSubmitting || Boolean(submission)}
+        disabled={isSubmitting || Boolean(submission) || !selectedShipping}
       >
         {isSubmitting
           ? 'Enviando pedido...'

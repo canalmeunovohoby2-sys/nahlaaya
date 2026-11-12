@@ -5,6 +5,7 @@ import {
   updateShippingSettings,
 } from '../../services/supabase/admin'
 import { AdminApiError } from '../../admin/errors'
+import { estimatedPackagingFormValues } from '../../lib/shipping-defaults'
 
 function formatCep(value: string): string {
   const digits = value.replace(/\D/g, '').slice(0, 8)
@@ -46,6 +47,7 @@ export function ShippingSettingsCard() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
+  const [estimateApplied, setEstimateApplied] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -78,6 +80,19 @@ export function ShippingSettingsCard() {
       active = false
     }
   }, [])
+
+  function applyEstimatedDefaults() {
+    const values = estimatedPackagingFormValues()
+    setPerfumeWeightGrams(values.perfumeWeightGrams)
+    setBoxWeightGrams(values.boxWeightGrams)
+    setBoxLengthCm(values.boxLengthCm)
+    setBoxWidthCm(values.boxWidthCm)
+    setBoxHeightCm(values.boxHeightCm)
+    setMaxPerfumesPerBox(values.maxPerfumesPerBox)
+    setEstimateApplied(true)
+    setError(null)
+    setSuccess(null)
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -182,12 +197,32 @@ export function ShippingSettingsCard() {
           </div>
 
           <div className="admin-shipping-settings__section">
-            <h3>Embalagem padrão</h3>
+            <h3>Padrão estimado de embalagem — Perfumes</h3>
             <p className="admin-card__hint">
               Medidas externas da caixa de envio, não o volume em ml do
               perfume. Produtos com peso e as quatro dimensões próprios
               preenchidos usam embalagem individual; os demais usam este padrão.
             </p>
+
+            <div className="admin-shipping-settings__estimate">
+              <button
+                type="button"
+                className="btn btn--outline btn--sm"
+                onClick={applyEstimatedDefaults}
+              >
+                Aplicar padrão estimado
+              </button>
+              <p className="admin-shipping-settings__warning">
+                Valores estimados. Confira o peso e as dimensões de uma
+                embalagem real antes de ativar cotações em produção.
+              </p>
+              {estimateApplied ? (
+                <p className="admin-row-feedback">
+                  Valores aplicados ao formulário. Revise os números e salve a
+                  configuração para confirmar.
+                </p>
+              ) : null}
+            </div>
 
             <div className="admin-shipping-settings__grid">
               <div className="admin-field">

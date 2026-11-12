@@ -21,10 +21,14 @@
     "test:checkout": "tsx --test tests/checkout-storage.test.ts",
     "test:melhor-envio": "tsx --test tests/melhor-envio-oauth.test.ts",
     "test:shipping": "tsx --test tests/shipping-product-preservation.test.ts",
-    "test:shipping-package": "tsx --test tests/shipping-package.test.ts"
+    "test:shipping-package": "tsx --test tests/shipping-package.test.ts",
+    "test:shipping-quote": "tsx --test tests/shipping-quote.test.ts",
+    "test:shipping-defaults": "tsx --test tests/shipping-defaults.test.ts"
   },
   "dependencies": {
+    "@fontsource/bodoni-moda": "^5.3.0",
     "@fontsource/dm-sans": "^5.3.0",
+    "@fontsource/lora": "^5.3.0",
     "@fontsource/outfit": "^5.3.0",
     "@supabase/supabase-js": "^2.118.0",
     "dotenv": "^18.0.9",

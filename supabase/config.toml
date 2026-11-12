@@ -43,3 +43,6 @@ verify_jwt = true
 
 [functions.melhor-envio-oauth-callback]
 verify_jwt = false
+
+[functions.calculate-shipping]
+verify_jwt = false
