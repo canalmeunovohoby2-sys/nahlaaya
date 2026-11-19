@@ -54,7 +54,7 @@
 
 .logo__image {
   display: block;
-  width: 104px;
+  width: 116px;
   height: auto;
 }
 
@@ -135,7 +135,54 @@
   display: flex;
   align-items: center;
   justify-self: end;
-  gap: 5px;
+  gap: 7px;
+}
+
+.header-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 9px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  color: var(--champagne);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s var(--ease);
+}
+
+.header-action:hover {
+  border-color: rgba(243, 228, 173, 0.18);
+  background: rgba(243, 228, 173, 0.08);
+  color: var(--white);
+  transform: translateY(-1px);
+}
+
+.header-action--whatsapp {
+  color: var(--gold-soft);
+}
+
+.header-action__icon {
+  position: relative;
+  display: inline-flex;
+}
+
+.header-action__label {
+  white-space: nowrap;
+}
+
+.site-header .cart-link__badge {
+  top: -5px;
+  right: -7px;
 }
 
 .site-header .icon-button {
@@ -509,7 +556,7 @@
   }
 
   .header-main {
-    grid-template-columns: 89px 1fr 89px;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
     gap: 8px;
     padding-block: 12px 10px;
   }
@@ -525,11 +572,17 @@
   }
 
   .site-header .logo__image {
-    width: 78px;
+    width: 86px;
   }
 
   .header-actions {
-    gap: 1px;
+    gap: 2px;
+  }
+
+  .header-action {
+    gap: 5px;
+    padding-inline: 7px;
+    font-size: 11px;
   }
 
   .header-search {
@@ -547,7 +600,17 @@
 
 @media (max-width: 380px) {
   .site-header .logo__image {
-    width: 70px;
+    width: 78px;
+  }
+}
+
+@media (max-width: 380px) {
+  .header-action__label {
+    display: none;
+  }
+
+  .header-action {
+    padding-inline: 10px;
   }
 }
 
@@ -563,7 +626,7 @@
 
 @media (max-width: 340px) {
   .site-header .logo__image {
-    width: 64px;
+    width: 70px;
   }
 
   .header-search__submit {

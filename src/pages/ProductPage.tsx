@@ -6,6 +6,7 @@ import {
   BagIcon,
   CheckIcon,
   FlowerIcon,
+  WhatsAppIcon,
 } from '../components/icons/Icons'
 import { Breadcrumb } from '../components/ui/PageHeader'
 import { EmptyState } from '../components/ui/EmptyState'
@@ -20,6 +21,7 @@ import {
   slugify,
 } from '../lib/catalog'
 import { formatCurrency, formatVolume, getInstallmentAmount } from '../lib/format'
+import { buildProductWhatsAppUrl } from '../lib/whatsapp'
 
 
 export function ProductPage() {
@@ -76,6 +78,12 @@ function ProductPageContent({ slug }: { slug: string }) {
   const relatedProducts = getRelatedProducts(product)
 
   const activeImageSource = product.images[activeImage] ?? product.images[0]
+  const productWhatsAppUrl = buildProductWhatsAppUrl(
+    product.name,
+    product.slug,
+    typeof window === 'undefined' ? '' : window.location.origin,
+  )
+
 
   function handleAdd(goToCart = false) {
     if (!product || soldOut) {
@@ -194,6 +202,16 @@ function ProductPageContent({ slug }: { slug: string }) {
                 </div>
               </div>
             </div>
+
+            <a
+              className="product-whatsapp"
+              href={productWhatsAppUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <WhatsAppIcon width={19} height={19} />
+              Dúvidas sobre este perfume? Fale conosco
+            </a>
 
             <p
               className={`stock-status${

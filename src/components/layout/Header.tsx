@@ -3,7 +3,8 @@ import type { FormEvent } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { navigation } from '../../data/categories'
 import { useCart } from '../../hooks/useCart'
-import { BagIcon, MenuIcon, SearchIcon } from '../icons/Icons'
+import { BagIcon, MenuIcon, SearchIcon, WhatsAppIcon } from '../icons/Icons'
+import { buildWhatsAppUrl, WHATSAPP_HEADER_MESSAGE } from '../../lib/whatsapp'
 import { Logo } from '../ui/Logo'
 import { MobileMenu } from './MobileMenu'
 
@@ -99,21 +100,35 @@ export function Header() {
             <NavLink
               to="/carrinho"
               className={({ isActive }) =>
-                `icon-button cart-link${isActive ? ' is-active' : ''}`
+                `header-action header-action--cart cart-link${isActive ? ' is-active' : ''}`
               }
               aria-label={
                 totalItems > 0
-                  ? `Sacola com ${totalItems} ${totalItems === 1 ? 'item' : 'itens'}`
-                  : 'Sacola vazia'
+                  ? `Carrinho com ${totalItems} ${totalItems === 1 ? 'item' : 'itens'}`
+                  : 'Carrinho vazio'
               }
             >
-              <BagIcon width={22} height={22} />
-              {totalItems > 0 ? (
-                <span className="cart-link__badge" aria-hidden="true">
-                  {totalItems > 99 ? '99+' : totalItems}
-                </span>
-              ) : null}
+              <span className="header-action__icon">
+                <BagIcon width={21} height={21} />
+                {totalItems > 0 ? (
+                  <span className="cart-link__badge" aria-hidden="true">
+                    {totalItems > 99 ? '99+' : totalItems}
+                  </span>
+                ) : null}
+              </span>
+              <span className="header-action__label">Carrinho</span>
             </NavLink>
+
+            <a
+              className="header-action header-action--whatsapp"
+              href={buildWhatsAppUrl(WHATSAPP_HEADER_MESSAGE)}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Falar com a Nahla Aya pelo WhatsApp"
+            >
+              <WhatsAppIcon width={21} height={21} />
+              <span className="header-action__label">WhatsApp</span>
+            </a>
           </div>
         </div>
 

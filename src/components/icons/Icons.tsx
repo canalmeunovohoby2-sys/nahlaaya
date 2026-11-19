@@ -204,6 +204,15 @@ export function ChatIcon(props: IconProps) {
   )
 }
 
+export function WhatsAppIcon(props: IconProps) {
+  return (
+    <IconBase {...props}>
+      <path d="M20.5 11.7a8.5 8.5 0 0 1-12.6 7.5L3.5 20.5l1.3-4.3A8.5 8.5 0 1 1 20.5 11.7Z" />
+      <path d="M9.6 8.2c.4 1.5 1.7 2.8 3.2 3.2l.8-1.2 1.7.8-.5 1.5c-.2.5-.7.7-1.2.6-3.5-.7-6.2-3.4-6.9-6.9-.1-.5.1-1 .6-1.2l1.5-.5.8 1.7-1.2.8Z" />
+    </IconBase>
+  )
+}
+
 export function ArrowUpRightIcon(props: IconProps) {
   return (
     <IconBase {...props}>

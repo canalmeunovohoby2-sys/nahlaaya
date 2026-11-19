@@ -24,7 +24,8 @@
     "test:shipping-package": "tsx --test tests/shipping-package.test.ts",
     "test:shipping-quote": "tsx --test tests/shipping-quote.test.ts",
     "test:shipping-defaults": "tsx --test tests/shipping-defaults.test.ts",
-    "test:mercadopago": "tsx --test tests/mercadopago.test.ts"
+    "test:mercadopago": "tsx --test tests/mercadopago.test.ts",
+    "test:whatsapp": "tsx --test tests/whatsapp.test.ts"
   },
   "dependencies": {
     "@fontsource/bodoni-moda": "^5.3.0",
