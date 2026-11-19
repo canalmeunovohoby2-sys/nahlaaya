@@ -171,6 +171,10 @@
   color: var(--gold-soft);
 }
 
+.header-action--whatsapp svg {
+  color: #25d366;
+}
+
 .header-action__icon {
   position: relative;
   display: inline-flex;

@@ -17,35 +17,26 @@ test('mensagem do cabeçalho usa o número e o texto definidos', () => {
   )
 })
 
-test('mensagem do produto usa nome e link reais e codifica acentos', () => {
-  const url = buildProductWhatsAppUrl(
-    'RÊVE DE PARIS — 100 ml',
-    'reve-de-paris-100-ml',
-    'https://nahlaaya.vercel.app',
-  )
+test('mensagem do produto usa apenas o nome real, sem links', () => {
+  const name = 'RÊVE DE PARIS — 100 ml'
+  const url = buildProductWhatsAppUrl(name)
   const message = new URL(url).searchParams.get('text') ?? ''
 
+  assert.equal(message, buildProductWhatsAppMessage(name))
   assert.equal(
     message,
-    buildProductWhatsAppMessage(
-      'RÊVE DE PARIS — 100 ml',
-      'https://nahlaaya.vercel.app/produto/reve-de-paris-100-ml',
-    ),
+    'Olá! Estou interessado(a) no perfume RÊVE DE PARIS — 100 ml da Nahla Aya e gostaria de tirar algumas dúvidas. Poderiam me ajudar?',
   )
-  assert.match(message, /RÊVE DE PARIS — 100 ml/)
-  assert.match(message, /https:\/\/nahlaaya\.vercel\.app\/produto\/reve-de-paris-100-ml/)
+  assert.equal(message.includes('http'), false)
   assert.match(url, /R%C3%8AVE%20DE%20PARIS/)
 })
 
-test('novo produto arbitrário recebe link dinâmico', () => {
-  const url = buildProductWhatsAppUrl(
-    'Perfume Novo',
-    'perfume-novo',
-    'https://nahlaaya.vercel.app/',
+test('novo produto arbitrário usa o nome dinâmico e não inclui URL', () => {
+  const message = new URL(buildProductWhatsAppUrl('Perfume Novo')).searchParams.get(
+    'text',
   )
-  const message = new URL(url).searchParams.get('text') ?? ''
 
-  assert.match(message, /perfume Perfume Novo da Nahla Aya/)
-  assert.match(message, /Link do produto: https:\/\/nahlaaya\.vercel\.app\/produto\/perfume-novo/)
-  assert.equal(new URL(url).searchParams.get('text'), message)
+  assert.match(message ?? '', /perfume Perfume Novo da Nahla Aya/)
+  assert.equal((message ?? '').includes('http'), false)
+  assert.equal((message ?? '').includes('/produto/'), false)
 })

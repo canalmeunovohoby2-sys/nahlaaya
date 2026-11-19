@@ -886,6 +886,7 @@
 
 .product-whatsapp svg {
   flex-shrink: 0;
+  color: #25d366;
 }
 
 @media (max-width: 560px) {

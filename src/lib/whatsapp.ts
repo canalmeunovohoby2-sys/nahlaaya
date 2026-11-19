@@ -9,20 +9,10 @@ export function buildWhatsAppUrl(message: string): string {
 
 export function buildProductWhatsAppMessage(
   productName: string,
-  productUrl: string,
 ): string {
-  return `Olá! Estou interessado(a) no perfume ${productName} da Nahla Aya e gostaria de tirar algumas dúvidas. Poderiam me ajudar?\n\nLink do produto: ${productUrl}`
+  return `Olá! Estou interessado(a) no perfume ${productName} da Nahla Aya e gostaria de tirar algumas dúvidas. Poderiam me ajudar?`
 }
 
-export function buildProductWhatsAppUrl(
-  productName: string,
-  productSlug: string,
-  origin: string,
-): string {
-  const base = origin.replace(/\/+$/, '')
-  const productUrl = `${base}/produto/${encodeURIComponent(productSlug)}`
-
-  return buildWhatsAppUrl(
-    buildProductWhatsAppMessage(productName, productUrl),
-  )
+export function buildProductWhatsAppUrl(productName: string): string {
+  return buildWhatsAppUrl(buildProductWhatsAppMessage(productName))
 }

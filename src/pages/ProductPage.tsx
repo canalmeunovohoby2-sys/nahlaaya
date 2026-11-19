@@ -78,11 +78,7 @@ function ProductPageContent({ slug }: { slug: string }) {
   const relatedProducts = getRelatedProducts(product)
 
   const activeImageSource = product.images[activeImage] ?? product.images[0]
-  const productWhatsAppUrl = buildProductWhatsAppUrl(
-    product.name,
-    product.slug,
-    typeof window === 'undefined' ? '' : window.location.origin,
-  )
+  const productWhatsAppUrl = buildProductWhatsAppUrl(product.name)
 
 
   function handleAdd(goToCart = false) {
