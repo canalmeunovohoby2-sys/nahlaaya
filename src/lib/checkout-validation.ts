@@ -104,5 +104,11 @@ export function isValidEmail(value: string): boolean {
 
 export function isValidPhone(value: string): boolean {
   const digits = onlyDigits(value)
-  return digits.length === 10 || digits.length === 11
+
+  if (digits.length !== 10 && digits.length !== 11) {
+    return false
+  }
+
+  const ddd = Number(digits.slice(0, 2))
+  return ddd >= 11 && ddd <= 99
 }

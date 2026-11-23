@@ -29,6 +29,7 @@ export interface AdminOrderListItem {
   created_at: string
   customer_name: string
   customer_email: string
+  customer_phone: string
 }
 
 export interface AdminDashboard {

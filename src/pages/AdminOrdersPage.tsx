@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AdminOrderDetailPanel } from '../components/admin/AdminOrderDetail'
+import { AdminWhatsAppLink } from '../components/admin/AdminWhatsAppLink'
 import { useAdminAuth } from '../admin/admin-auth-context'
 import { getOrder, getOrders } from '../admin/api'
 import {
@@ -150,6 +151,7 @@ export function AdminOrdersPage() {
                   <tr>
                     <th>Pedido</th>
                     <th>Cliente</th>
+                    <th>WhatsApp</th>
                     <th>Total</th>
                     <th>Pagamento</th>
                   </tr>
@@ -177,6 +179,13 @@ export function AdminOrdersPage() {
                         <span className="admin-table__sub">
                           {paymentMethodLabels[order.payment_method]}
                         </span>
+                      </td>
+                      <td>
+                        <AdminWhatsAppLink
+                          customerName={order.customer_name}
+                          phone={order.customer_phone}
+                          compact
+                        />
                       </td>
                       <td>{formatCents(order.total_cents)}</td>
                       <td>

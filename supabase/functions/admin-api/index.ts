@@ -72,6 +72,7 @@ function orderListItem(order: Record<string, unknown>) {
     created_at: order.created_at,
     customer_name: customer?.full_name ?? '',
     customer_email: customer?.email ?? '',
+    customer_phone: customer?.phone ?? '',
   }
 }
 
@@ -355,7 +356,7 @@ Deno.serve(async (request) => {
     if (request.method === 'GET' && action === 'dashboard') {
       const { data, error } = await client
         .from('orders')
-        .select('*, customers(full_name,email), order_items(quantity)')
+        .select('*, customers(full_name,email,phone), order_items(quantity)')
         .order('created_at', { ascending: false })
 
       if (error) throw new HttpError(500, error.message)
@@ -912,7 +913,7 @@ Deno.serve(async (request) => {
     if (request.method === 'GET' && action === 'orders') {
       const { data, error } = await client
         .from('orders')
-        .select('*, customers(full_name,email)')
+        .select('*, customers(full_name,email,phone)')
         .order('created_at', { ascending: false })
         .limit(200)
 

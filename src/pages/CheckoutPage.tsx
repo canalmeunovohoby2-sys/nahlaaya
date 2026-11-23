@@ -338,7 +338,7 @@ export function CheckoutPage() {
                     />
                     <CheckoutField
                       id="checkout-phone"
-                      label="Telefone / WhatsApp"
+                      label="WhatsApp com DDD"
                       value={form.phone}
                       onChange={(value) => handleFieldChange('phone', value)}
                       error={errors.phone}

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AdminWhatsAppLink } from './AdminWhatsAppLink'
 import {
   AdminApiError,
   updateDeliveryStatus,
@@ -9,7 +10,6 @@ import {
   formatCents,
   formatCpfDisplay,
   formatDateTime,
-  formatPhoneDisplay,
   paymentMethodLabels,
   paymentStatusLabels,
   statusTone,
@@ -137,7 +137,10 @@ export function AdminOrderDetailPanel({
           <p>{order.customer_name}</p>
           <p>{order.customer_email}</p>
           <p>{formatCpfDisplay(order.customer_cpf)}</p>
-          <p>{formatPhoneDisplay(order.customer_phone)}</p>
+          <AdminWhatsAppLink
+            customerName={order.customer_name}
+            phone={order.customer_phone}
+          />
         </div>
         <div className="admin-detail-block">
           <h3>Entrega</h3>

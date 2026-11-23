@@ -83,7 +83,7 @@ export function validateCheckoutForm(
   }
 
   if (!isValidPhone(values.phone)) {
-    errors.phone = 'Informe um telefone válido com DDD.'
+    errors.phone = 'Informe um WhatsApp válido com DDD.'
   }
 
   if (!isValidCep(values.cep)) {
